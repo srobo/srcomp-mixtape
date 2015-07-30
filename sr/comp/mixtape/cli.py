@@ -30,7 +30,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def play_track(filename, generation_number, output_device, group):
+def play_track(filename, generation_number, output_device, group, trim_start):
     global exclusivity_groups
 
     if generation_number == current_generation:
@@ -38,6 +38,8 @@ def play_track(filename, generation_number, output_device, group):
         args = ['sox', filename, '-t', 'coreaudio']
         if output_device is not None:
             args.append(output_device)
+        if trim_start != 0:
+            args += ['trim', str(trim_start)]
 
         if group is not None:
             existing_process = exclusivity_groups.get(group, None)
@@ -86,8 +88,9 @@ def mainloop(args):
                 with open(path, 'rb') as file:
                     file.read(1)
 
+                trim_start = 0
                 if track['start'] < current_offset():
-                    continue
+                    trim_start = current_offset() - track['start']
 
                 output_device = track.get('output_device', None)
                 group = track.get('group', None)
@@ -95,7 +98,7 @@ def mainloop(args):
                 print('Scheduling', path, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
                                   argument=(path, current_generation,
-                                            output_device, group))
+                                            output_device, group, trim_start))
 
             thread = Thread(target=schedule.run)
             thread.daemon = True
