@@ -18,6 +18,7 @@ import yaml
 
 current_generation = 0
 dev_null = open('/dev/null', 'wb')
+exclusivity_groups = {}
 
 
 def parse_args():
@@ -29,13 +30,23 @@ def parse_args():
     return parser.parse_args()
 
 
-def play_track(filename, generation_number, output_device):
+def play_track(filename, generation_number, output_device, group):
+    global exclusivity_groups
+
     if generation_number == current_generation:
         print('Playing', filename)
         args = ['sox', filename, '-t', 'coreaudio']
         if output_device is not None:
             args.append(output_device)
-        subprocess.Popen(args, stdout=dev_null, stderr=dev_null)
+
+        if group is not None:
+            existing_process = exclusivity_groups.get(group, None)
+            if existing_process is not None:
+                existing_process.terminate()
+
+        process = subprocess.Popen(args, stdout=dev_null, stderr=dev_null)
+        if group is not None:
+            exclusivity_groups[group] = process
 
 
 def mainloop(args):
@@ -79,11 +90,12 @@ def mainloop(args):
                     continue
 
                 output_device = track.get('output_device', None)
+                group = track.get('group', None)
 
                 print('Scheduling', path, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
                                   argument=(path, current_generation,
-                                            output_device))
+                                            output_device, group))
 
             thread = Thread(target=schedule.run)
             thread.daemon = True
