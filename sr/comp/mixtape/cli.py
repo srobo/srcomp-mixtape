@@ -2,16 +2,17 @@ from __future__ import division
 from __future__ import print_function
 
 from argparse import ArgumentParser
+from datetime import datetime, timedelta
+import json
 import os.path
 import sched
 import subprocess
 import time
 from threading import Thread
 
-from datetime import datetime, timedelta
 import dateutil.parser
 from dateutil.tz import tzutc
-import json
+import requests
 from sseclient import SSEClient
 import yaml
 
@@ -23,11 +24,20 @@ exclusivity_groups = {}
 
 def parse_args():
     parser = ArgumentParser(__name__)
+    parser.add_argument('api')
     parser.add_argument('stream')
     parser.add_argument('mixtape')
     parser.add_argument('--latency', '-l', type=int, default=950,
                         help='In milliseconds.')
     return parser.parse_args()
+
+
+def get_match_schedule(base_url, start_time):
+    params = {
+        'slot_start_time': start_time.isoformat() + '..'
+    }
+    json = requests.get('{}/matches'.format(base_url), params=params).json()
+    return json
 
 
 def play_track(filename, generation_number, output_device, group, trim_start):
@@ -57,20 +67,28 @@ def mainloop(args):
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
         playlist = yaml.load(file)
 
+    prev_match = None
+
     stream = SSEClient(args.stream)
     for message in stream:
         if message.event == 'match':
             matches = json.loads(message.data)
+            if matches:
+                match = matches[0]
+
             if not matches:
-                print('Waiting for a match.')
-                continue
+                try:
+                    match = get_match_schedule(args.api, datetime.now(tzutc()))['matches'][0]
+                except (KeyError, IndexError):
+                    print('Waiting for a match.')
+                    continue
+
+            if prev_match is not None:
+                if match['num'] == prev_match['num']:
+                    if match['times']['game']['start'] == prev_match['times']['game']['start']:
+                        continue
 
             current_generation += 1
-
-            match = matches[0]
-
-            if not all(m['num'] == match['num'] for m in matches):
-                raise ValueError("Matches don't have the same number.")
 
             num = match['num']
             tracks = playlist['tracks'].get(num, []) + playlist.get('all', [])
@@ -103,6 +121,8 @@ def mainloop(args):
             thread = Thread(target=schedule.run)
             thread.daemon = True
             thread.start()
+
+            prev_match = match
 
 
 def main():
