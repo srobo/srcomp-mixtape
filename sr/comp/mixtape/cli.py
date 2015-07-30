@@ -29,10 +29,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def play_track(filename, generation_number):
+def play_track(filename, generation_number, output_device):
     if generation_number == current_generation:
         print('Playing', filename)
-        args = ['play', filename]
+        args = ['sox', filename, '-t', 'coreaudio']
+        if output_device is not None:
+            args.append(output_device)
         subprocess.Popen(args, stdout=dev_null, stderr=dev_null)
 
 
@@ -58,7 +60,7 @@ def mainloop(args):
                 raise ValueError("Matches don't have the same number.")
 
             num = match['num']
-            tracks = playlist['tracks'][num] + playlist['all']
+            tracks = playlist['tracks'].get(num, []) + playlist.get('all', [])
 
             game_start = dateutil.parser.parse(match['times']['game']['start']) - timedelta(seconds=args.latency / 1000)
 
@@ -76,9 +78,12 @@ def mainloop(args):
                 if track['start'] < current_offset():
                     continue
 
+                output_device = track.get('output_device', None)
+
                 print('Scheduling', path, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
-                                  argument=(path, current_generation))
+                                  argument=(path, current_generation,
+                                            output_device))
 
             thread = Thread(target=schedule.run)
             thread.daemon = True
