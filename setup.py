@@ -17,7 +17,9 @@ setup(
     author_email='srobo-devel@googlegroups.com',
     install_requires=[
         'requests >=2.5, <3',
-        'PyYaml >=3.11, <4'
+        'PyYaml >=3.11, <4',
+        'sseclient >=0.0, <1',
+        'python-dateutil >=2.4, <3'
     ],
     entry_points={
         'console_scripts': [
