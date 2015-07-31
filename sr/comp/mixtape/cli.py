@@ -24,11 +24,21 @@ exclusivity_groups = {}
 
 def parse_args():
     parser = ArgumentParser(__name__)
-    parser.add_argument('api')
-    parser.add_argument('stream')
-    parser.add_argument('mixtape')
-    parser.add_argument('--latency', '-l', type=int, default=950,
-                        help='In milliseconds.')
+
+    subparsers = parser.add_subparsers(help='Command to run.')
+
+    play = subparsers.add_parser('play', help='Play the mixtape.')
+    play.add_argument('mixtape')
+    play.add_argument('api')
+    play.add_argument('stream')
+    play.add_argument('--latency', '-l', type=int, default=950,
+                      help='In milliseconds.')
+    play.set_defaults(command='play')
+
+    verify = subparsers.add_parser('verify', help='Verify the mixtape.')
+    verify.add_argument('mixtape')
+    verify.set_defaults(command='verify')
+
     return parser.parse_args()
 
 
@@ -61,7 +71,7 @@ def play_track(filename, generation_number, output_device, group, trim_start):
             exclusivity_groups[group] = process
 
 
-def mainloop(args):
+def play(args):
     global current_generation
 
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
@@ -125,6 +135,26 @@ def mainloop(args):
             prev_match = match
 
 
+def verify_tracks(mixtape_dir, tracks):
+    for track in tracks:
+        path = os.path.join(mixtape_dir, track['filename'])
+        if not os.path.exists(path):
+            print(path, "doesn't exist!")
+
+
+def verify(args):
+    with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
+        playlist = yaml.load(file)
+
+    for num, tracks in playlist['tracks'].items():
+        verify_tracks(args.mixtape, tracks)
+
+    verify_tracks(args.mixtape, playlist.get('all', []))
+
+
 def main():
     args = parse_args()
-    mainloop(args)
+    if args.command == 'play':
+        play(args)
+    elif args.command == 'verify':
+        verify(args)
