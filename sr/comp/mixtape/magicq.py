@@ -13,9 +13,13 @@ class MagicqController:
         length = struct.pack('<H', len(data))
         return b'CREP\0\0\0\0' + length + data
 
-    def send_command(self, command):
+    def send_command_once(self, command):
+        self.send_command(command, 1)
+
+    def send_command(self, command, retries=5):
         packet = self.build_packet(command.encode('ascii'))
-        self.socket.sendto(packet, self.address)
+        for retry in range(retries):
+            self.socket.sendto(packet, self.address)
 
     def activate_playback(self, num):
         self.send_command(f'{num}A')
