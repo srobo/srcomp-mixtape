@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import json
 import os.path
 import sched
-import subprocess
 import time
 from threading import Thread
 
@@ -16,9 +15,13 @@ import requests
 from sseclient import SSEClient
 import yaml
 
+from .audio import AudioController
+from .magicq import MagicqController
 
+
+audio_controller = AudioController()
+magicq_controller = None
 current_generation = 0
-dev_null = open('/dev/null', 'wb')
 exclusivity_groups = {}
 
 
@@ -43,39 +46,46 @@ def parse_args():
 
 
 def get_match_schedule(base_url, start_time):
+    url = '{}/matches'.format(base_url)
     params = {
         'slot_start_time': start_time.isoformat() + '..'
     }
-    json = requests.get('{}/matches'.format(base_url), params=params).json()
-    return json
+    return requests.get(url, params=params).json()
 
 
-def play_track(filename, generation_number, output_device, group, trim_start):
+def play_track(filename, magicq_playback, magicq_cue, generation_number, output_device, group, trim_start):
     global exclusivity_groups
 
-    if generation_number == current_generation:
-        print('Playing', filename)
-        args = ['sox', filename, '-t', 'coreaudio']
-        if output_device is not None:
-            args.append(output_device)
-        if trim_start != 0:
-            args += ['trim', str(trim_start)]
+    if generation_number != current_generation:
+        return
 
+    if filename is not None:
         if group is not None:
             existing_process = exclusivity_groups.get(group, None)
             if existing_process is not None:
                 existing_process.terminate()
 
-        process = subprocess.Popen(args, stdout=dev_null, stderr=dev_null)
+        process = audio_controller.play(filename, output_device, trim_start)
+
         if group is not None:
             exclusivity_groups[group] = process
 
+    if magicq_cue is not None:
+        magicq_controller.jump_to_cue(magicq_playback, magicq_cue)
+
 
 def play(args):
-    global current_generation
+    global current_generation, magicq_controller
 
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
         playlist = yaml.load(file)
+
+    if 'magicq' in playlist:
+        config = playlist['magicq']
+        magicq_controller = MagicqController((config['host'], config['port']))
+        magicq_playback = config['playback']
+    else:
+        magicq_playback = None
 
     prev_match = None
 
@@ -110,11 +120,16 @@ def play(args):
 
             schedule = sched.scheduler(current_offset, time.sleep)
             for track in tracks:
-                path = os.path.join(args.mixtape, track['filename'])
+                try:
+                    magicq_cue = None
+                    path = os.path.join(args.mixtape, track['filename'])
 
-                # load into filesystem cache
-                with open(path, 'rb') as file:
-                    file.read(1)
+                    # load into filesystem cache
+                    with open(path, 'rb') as file:
+                        file.read(1)
+                except KeyError:
+                    magicq_cue = track['magicq_cue']
+                    path = None
 
                 trim_start = 0
                 if track['start'] < current_offset():
@@ -123,10 +138,13 @@ def play(args):
                 output_device = track.get('output_device', None)
                 group = track.get('group', None)
 
-                print('Scheduling', path, 'for', track['start'])
+                name = path or f'MagicQ({magicq_cue})'
+
+                print('Scheduling', name, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
-                                  argument=(path, current_generation,
-                                            output_device, group, trim_start))
+                                  argument=(path, magicq_playback, magicq_cue,
+                                            current_generation, output_device,
+                                            group, trim_start))
 
             thread = Thread(target=schedule.run)
             thread.daemon = True
@@ -152,9 +170,20 @@ def verify(args):
     verify_tracks(args.mixtape, playlist.get('all', []))
 
 
+def test(args):
+    with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
+        playlist = yaml.load(file)
+
+    config = playlist['magicq']
+    magicq_controller = MagicqController((config['host'], config['port']))
+    magicq_playback = config['playback']
+
+
 def main():
     args = parse_args()
     if args.command == 'play':
         play(args)
     elif args.command == 'verify':
         verify(args)
+    elif args.command == 'test':
+        test(args)
