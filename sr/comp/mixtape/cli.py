@@ -169,7 +169,7 @@ def verify_tracks(mixtape_dir, tracks):
 
 def verify(args):
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
-        playlist = yaml.load(file)
+        playlist = yaml.safe_load(file)
 
     for num, tracks in playlist['tracks'].items():
         verify_tracks(args.mixtape, tracks)
@@ -179,7 +179,7 @@ def verify(args):
 
 def test(args):
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
-        playlist = yaml.load(file)
+        playlist = yaml.safe_load(file)
 
     config = playlist['magicq']
     magicq_controller = MagicqController((config['host'], config['port']))
