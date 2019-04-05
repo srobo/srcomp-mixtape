@@ -21,7 +21,6 @@ from .magicq import MagicqController
 
 audio_controller = AudioController()
 magicq_controller = None
-magicq_playback = None
 current_generation = 0
 exclusivity_groups = {}
 
@@ -58,14 +57,14 @@ def get_match_schedule(base_url, start_time):
     return requests.get(url, params=params).json()
 
 
-def play_track(filename, magicq_cue, generation_number, output_device, group, trim_start):
+def play_track(filename, magicq_playback, magicq_cue, generation_number, output_device, group, trim_start):
     global exclusivity_groups
 
     if generation_number != current_generation:
         return
 
     if magicq_cue is not None:
-        magicq_controller.jump_to_cue(magicq_cue)
+        magicq_controller.jump_to_cue(magicq_playback, magicq_cue, 0)
 
     if filename is not None:
         if group is not None:
@@ -114,6 +113,7 @@ def play(args):
             current_generation += 1
 
             num = match['num']
+            print("Entering period for match", num)
             tracks = playlist['tracks'].get(num, []) + playlist.get('all', [])
 
             game_start = dateutil.parser.parse(match['times']['game']['start']) - timedelta(seconds=args.latency / 1000)
@@ -132,6 +132,7 @@ def play(args):
                         file.read(1)
                 except KeyError:
                     magicq_cue = track['magicq_cue']
+                    magicq_playback = track['magicq_playback']
                     path = None
 
                 trim_start = 0
@@ -141,11 +142,11 @@ def play(args):
                 output_device = track.get('output_device', None)
                 group = track.get('group', None)
 
-                name = path or f'MagicQ({magicq_cue})'
+                name = path or f'MagicQ({magicq_playback}, {magicq_cue})'
 
                 print('Scheduling', name, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
-                                  argument=(path, magicq_cue, current_generation,
+                                  argument=(path, magicq_playback, magicq_cue, current_generation,
                                             output_device, group, trim_start))
 
             thread = Thread(target=schedule.run)
@@ -157,7 +158,11 @@ def play(args):
 
 def verify_tracks(mixtape_dir, tracks):
     for track in tracks:
-        path = os.path.join(mixtape_dir, track['filename'])
+        try:
+            filename = track['filename']
+        except KeyError:
+            continue
+        path = os.path.join(mixtape_dir, filename)
         if not os.path.exists(path):
             print(path, "doesn't exist!")
 
@@ -178,11 +183,10 @@ def test(args):
 
     config = playlist['magicq']
     magicq_controller = MagicqController((config['host'], config['port']))
-    magicq_playback = config['playback']
 
-    magicq_controller.jump_to_cue(magicq_playback, 1, 0)
+    magicq_controller.jump_to_cue(4, 2, 0)
     time.sleep(1)
-    magicq_controller.jump_to_cue(magicq_playback, 2, 0)
+    #magicq_controller.jump_to_cue(3, 2, 0)
 
 
 def main():
