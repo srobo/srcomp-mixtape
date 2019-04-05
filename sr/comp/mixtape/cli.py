@@ -13,7 +13,7 @@ import dateutil.parser
 from dateutil.tz import tzutc
 import requests
 from sseclient import SSEClient
-import yaml
+from ruamel import yaml
 
 from .audio import AudioController
 from .magicq import MagicqController
