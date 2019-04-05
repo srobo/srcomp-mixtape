@@ -82,7 +82,7 @@ def play(args):
     global current_generation, magicq_controller, magicq_playback
 
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
-        playlist = yaml.load(file)
+        playlist = yaml.safe_load(file)
 
     if 'magicq' in playlist:
         config = playlist['magicq']
