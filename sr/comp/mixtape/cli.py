@@ -57,7 +57,7 @@ def get_match_schedule(base_url, start_time):
     return requests.get(url, params=params).json()
 
 
-def play_track(filename, magicq_playback, magicq_cue, generation_number, output_device, group, trim_start, audio_backend):
+def play_track(filename, magicq_playback, magicq_cue, generation_number, output_device, group, trim_start, audio_controller):
     global exclusivity_groups
 
     if generation_number != current_generation:
@@ -72,7 +72,7 @@ def play_track(filename, magicq_playback, magicq_cue, generation_number, output_
             if existing_process is not None:
                 existing_process.terminate()
 
-        process = AudioController(audio_backend).play(filename, output_device, trim_start)
+        process = audio_controller.play(filename, output_device, trim_start)
 
         if group is not None:
             exclusivity_groups[group] = process
@@ -90,6 +90,8 @@ def play(args):
         magicq_playback = config['playback']
 
     prev_match = None
+
+    audio_controller = AudioController(args.audio_backend)
 
     stream = SSEClient(args.stream)
     for message in stream:
@@ -147,7 +149,7 @@ def play(args):
                 print('Scheduling', name, 'for', track['start'])
                 schedule.enterabs(track['start'], 0, play_track,
                                   argument=(path, magicq_playback, magicq_cue, current_generation,
-                                            output_device, group, trim_start, args.audio_backend))
+                                            output_device, group, trim_start, audio_controller))
 
             thread = Thread(target=schedule.run)
             thread.daemon = True
