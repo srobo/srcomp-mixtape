@@ -79,7 +79,7 @@ def play_track(filename, magicq_playback, magicq_cue, generation_number, output_
 
 
 def play(args):
-    global current_generation, magicq_controller, magicq_playback
+    global current_generation, magicq_controller
 
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
@@ -87,7 +87,6 @@ def play(args):
     if 'magicq' in playlist:
         config = playlist['magicq']
         magicq_controller = MagicqController((config['host'], config['port']))
-        magicq_playback = config['playback']
 
     prev_match = None
 
@@ -127,6 +126,7 @@ def play(args):
             for track in tracks:
                 try:
                     magicq_cue = None
+                    magicq_playback = None
                     path = os.path.join(args.mixtape, track['filename'])
 
                     # load into filesystem cache
