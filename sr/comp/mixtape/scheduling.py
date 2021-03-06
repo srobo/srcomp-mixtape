@@ -128,7 +128,7 @@ class Scheduler:
         thread.start()
         return thread
 
-    def run(self):
+    def run(self) -> None:
         prev_match: Optional[Match] = None
 
         for message in self.stream:

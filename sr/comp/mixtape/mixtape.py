@@ -1,10 +1,11 @@
 import functools
 import os.path
 import subprocess
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Iterator, Optional
 
 from .audio import AudioController
 from .magicq import MagicqController
+from .scheduling import ActionSpec, Match
 
 
 class Mixtape:
@@ -21,7 +22,13 @@ class Mixtape:
         self.exclusivity_groups: Dict[object, subprocess.Popen[bytes]] = {}
         self.magicq_controller = magicq_controller
 
-    def play_track(self, filename, output_device, group, trim_start):
+    def play_track(
+        self,
+        filename: str,
+        output_device: str,
+        group: Optional[object],
+        trim_start: float,
+    ) -> None:
         if group is not None:
             existing_process = self.exclusivity_groups.get(group, None)
             if existing_process is not None:
@@ -39,7 +46,11 @@ class Mixtape:
             )
         self.magicq_controller.jump_to_cue(magicq_playback, magicq_cue, 0)
 
-    def generate_play_actions(self, current_offset, match):
+    def generate_play_actions(
+        self,
+        current_offset: Callable[[], float],
+        match: Match,
+    ) -> Iterator[ActionSpec]:
         num = match['num']
         tracks = self.playlist['tracks'].get(num, []) + self.playlist.get('all', [])
 
