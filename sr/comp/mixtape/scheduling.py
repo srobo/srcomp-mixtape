@@ -105,6 +105,11 @@ class Scheduler:
         game_start = dateutil.parser.parse(match['times']['game']['start']) - self.latency
 
         def current_offset() -> float:
+            """
+            The number of seconds since the match began.
+
+            If the match has not yet begun, the value returned is negative.
+            """
             return (now_utc() - game_start).total_seconds()
 
         schedule = sched.scheduler(current_offset, time.sleep)
