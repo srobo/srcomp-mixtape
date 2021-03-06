@@ -5,6 +5,7 @@ import threading
 import time
 from typing import (
     Callable,
+    cast,
     Iterable,
     List,
     NewType,
@@ -96,7 +97,7 @@ class Scheduler:
         params = {
             'slot_start_time': start_time.isoformat() + '..',
         }
-        return requests.get(url, params=params).json()
+        return cast(MatchSchedule, requests.get(url, params=params).json())
 
     def create_schedule_from(self, match: Match) -> sched.scheduler:
         num = match['num']

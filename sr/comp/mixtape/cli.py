@@ -56,7 +56,7 @@ def play(args):
 
     audio_controller = AudioController(args.audio_backend)
 
-    mixtape = Mixtape(playlist, audio_controller, magicq_controller)
+    mixtape = Mixtape(args.mixtape, playlist, audio_controller, magicq_controller)
 
     scheduler = Scheduler(
         api_url=args.api,

@@ -1,7 +1,7 @@
 import functools
 import os.path
 import subprocess
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .audio import AudioController
 from .magicq import MagicqController
@@ -13,12 +13,12 @@ class Mixtape:
         root: str,
         playlist: Any,
         audio_controller: AudioController,
-        magicq_controller: MagicqController,
+        magicq_controller: Optional[MagicqController],
     ) -> None:
         self.root = root
         self.playlist = playlist
         self.audio_controller = audio_controller
-        self.exclusivity_groups: Dict[object, subprocess.Popen] = {}
+        self.exclusivity_groups: Dict[object, subprocess.Popen[bytes]] = {}
         self.magicq_controller = magicq_controller
 
     def play_track(self, filename, output_device, group, trim_start):
@@ -33,6 +33,10 @@ class Mixtape:
             self.exclusivity_groups[group] = process
 
     def run_cue(self, magicq_playback, magicq_cue):
+        if self.magicq_controller is None:
+            raise ValueError(
+                "Need a magicq_controller to cue {}".format(magicq_cue),
+            )
         self.magicq_controller.jump_to_cue(magicq_playback, magicq_cue, 0)
 
     def generate_play_actions(self, current_offset, match):
