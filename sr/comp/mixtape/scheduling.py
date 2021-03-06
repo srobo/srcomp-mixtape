@@ -12,8 +12,8 @@ from typing import (
     Optional,
     Protocol,
     Tuple,
-    TypedDict,
 )
+from typing_extensions import TypedDict
 
 import dateutil.parser
 import requests

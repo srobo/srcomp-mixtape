@@ -17,6 +17,7 @@ setup(
         'ruamel.yaml >=0.15, <0.16',
         'sseclient >=0.0, <1',
         'python-dateutil >=2.4, <3',
+        'typing-extensions >=3.7.4.3, <4',
     ],
     entry_points={
         'console_scripts': [
