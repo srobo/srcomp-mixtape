@@ -1,7 +1,7 @@
-from argparse import ArgumentParser
-from datetime import timedelta
 import os.path
 import time
+from argparse import ArgumentParser
+from datetime import timedelta
 
 from ruamel import yaml
 
@@ -20,9 +20,18 @@ def parse_args():
     play.add_argument('mixtape')
     play.add_argument('api')
     play.add_argument('stream')
-    play.add_argument('--latency', '-l', type=int, default=950,
-                      help='In milliseconds.')
-    play.add_argument('--audio-backend', default='coreaudio', help="Audio backend passed to `sox`")
+    play.add_argument(
+        '--latency',
+        '-l',
+        type=int,
+        default=950,
+        help='In milliseconds.',
+    )
+    play.add_argument(
+        '--audio-backend',
+        default='coreaudio',
+        help="Audio backend passed to `sox`",
+    )
     play.set_defaults(command='play')
 
     verify = subparsers.add_parser('verify', help='Verify the mixtape.')
@@ -47,7 +56,7 @@ def play(args):
 
     audio_controller = AudioController(args.audio_backend)
 
-    mixtape = Mixtape(playlist, audio_controller, magicq_controller)
+    mixtape = Mixtape(args.mixtape, playlist, audio_controller, magicq_controller)
 
     scheduler = Scheduler(
         api_url=args.api,

@@ -1,22 +1,23 @@
 import datetime
 import json
 import sched
-import time
 import threading
+import time
 from typing import (
     Callable,
+    cast,
     Iterable,
     List,
     NewType,
     Optional,
     Protocol,
     Tuple,
-    TypedDict,
 )
+from typing_extensions import TypedDict
 
 import dateutil.parser
 import requests
-import sseclient
+import sseclient  # type: ignore[import]
 from dateutil.tz import tzutc
 
 TLA = NewType('TLA', str)
@@ -59,7 +60,7 @@ class Match(TypedDict):
     scores: object
     teams: List[TLA]
     times: Times
-    type: object
+    type: object  # noqa:A003
 
 
 class MatchSchedule(TypedDict):
@@ -96,7 +97,7 @@ class Scheduler:
         params = {
             'slot_start_time': start_time.isoformat() + '..',
         }
-        return requests.get(url, params=params).json()
+        return cast(MatchSchedule, requests.get(url, params=params).json())
 
     def create_schedule_from(self, match: Match) -> sched.scheduler:
         num = match['num']
