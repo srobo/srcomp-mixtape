@@ -8,6 +8,14 @@ from .magicq import MagicqController
 from .scheduling import Action
 
 
+def preload(filename: str):
+    """
+    Helper to force a file into the filesystem cache.
+    """
+    with open(filename, mode='rb') as f:
+        f.read(1)
+
+
 class Mixtape:
     def __init__(
         self,
@@ -47,9 +55,7 @@ class Mixtape:
         output_device = track.get('output_device', None)
         group = track.get('group', None)
 
-        # load into filesystem cache
-        with open(path, 'rb') as file:
-            file.read(1)
+        preload(path)
 
         action = functools.partial(
             self.play_track,
