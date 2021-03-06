@@ -40,7 +40,7 @@ time it takes to decode compressed audio, which can throw off timings.
 ``playlist.yaml`` contains the following top-level keys:
 
 - ``magicq`` defines the MagicQ connection settings, for automatic triggering of lights.
-- ``tracks`` defines the triggers and tracks to be played in each match, as a giant dictionary of match number to track configuration.
+- ``tracks`` defines the triggers and tracks to be played in a specific match, as a giant dictionary of the match number to track configuration.
 - ``all`` defines the triggers and tracks to be played in *every* match, in the same format as a single match in ``tracks``.
 
 
