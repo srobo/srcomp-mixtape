@@ -92,7 +92,7 @@ def test(args):
 
     magicq_controller.jump_to_cue(4, 2, 0)
     time.sleep(1)
-    #magicq_controller.jump_to_cue(3, 2, 0)
+    # magicq_controller.jump_to_cue(3, 2, 0)
 
 
 def main():
