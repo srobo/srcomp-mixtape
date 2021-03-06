@@ -51,6 +51,11 @@ class Mixtape:
                 magicq_playback = track['magicq_playback']
                 magicq_cue = track['magicq_cue']
 
+                if self.magicq_controller is None:
+                    raise ValueError(
+                        "Need a magicq_controller to cue {}".format(magicq_cue),
+                    )
+
                 name = f'MagicQ({magicq_playback}, {magicq_cue})'
                 print('Scheduling', name, 'for', track['start'])
 
