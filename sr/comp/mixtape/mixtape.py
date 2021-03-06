@@ -1,10 +1,11 @@
 import functools
 import os.path
 import subprocess
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from .audio import AudioController
 from .magicq import MagicqController
+from .scheduling import Action
 
 
 class Mixtape:
@@ -32,57 +33,66 @@ class Mixtape:
         if group is not None:
             self.exclusivity_groups[group] = process
 
-    def run_cue(self, magicq_playback, magicq_cue):
+    def get_play_track_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+    ) -> Tuple[Action, str]:
+        path = os.path.join(self.root, track['filename'])
+
+        trim_start = 0
+        if track['start'] < current_offset():
+            trim_start = current_offset() - track['start']
+
+        output_device = track.get('output_device', None)
+        group = track.get('group', None)
+
+        # load into filesystem cache
+        with open(path, 'rb') as file:
+            file.read(1)
+
+        action = functools.partial(
+            self.play_track,
+            path,
+            output_device,
+            group,
+            trim_start,
+        )
+
+        return action, path
+
+    def get_run_cue_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+    ) -> Tuple[Action, str]:
+        magicq_playback = track['magicq_playback']
+        magicq_cue = track['magicq_cue']
+
         if self.magicq_controller is None:
             raise ValueError(
                 "Need a magicq_controller to cue {}".format(magicq_cue),
             )
-        self.magicq_controller.jump_to_cue(magicq_playback, magicq_cue, 0)
+        controller = self.magicq_controller
+
+        name = f'MagicQ({magicq_playback}, {magicq_cue})'
+
+        def action() -> None:
+            controller.jump_to_cue(magicq_playback, magicq_cue, 0)
+
+        return action, name
 
     def generate_play_actions(self, current_offset, match):
         num = match['num']
         tracks = self.playlist['tracks'].get(num, []) + self.playlist.get('all', [])
 
-        for track in tracks:
-            try:
-                path = os.path.join(self.root, track['filename'])
-
-            except KeyError:
-                magicq_playback = track['magicq_playback']
-                magicq_cue = track['magicq_cue']
-
-                if self.magicq_controller is None:
-                    raise ValueError(
-                        "Need a magicq_controller to cue {}".format(magicq_cue),
-                    )
-
-                name = f'MagicQ({magicq_playback}, {magicq_cue})'
-                print('Scheduling', name, 'for', track['start'])
-
-                yield track['start'], 0, functools.partial(
-                    self.run_cue,
-                    magicq_playback,
-                    magicq_cue,
-                )
-
+        for idx, track in enumerate(tracks):
+            if 'filename' in track:
+                action, name = self.get_play_track_action(track, current_offset)
+            elif 'magicq_playback' in track:
+                action, name = self.get_run_cue_action(track, current_offset)
             else:
-                print('Scheduling', path, 'for', track['start'])
+                raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
-                trim_start = 0
-                if track['start'] < current_offset():
-                    trim_start = current_offset() - track['start']
-
-                output_device = track.get('output_device', None)
-                group = track.get('group', None)
-
-                yield track['start'], 0, functools.partial(
-                    self.play_track,
-                    path,
-                    output_device,
-                    group,
-                    trim_start,
-                )
-
-                # load into filesystem cache
-                with open(path, 'rb') as file:
-                    file.read(1)
+            print('Scheduling', name, 'for', track['start'])
+            yield track['start'], 0, action
