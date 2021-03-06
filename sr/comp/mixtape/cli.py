@@ -1,28 +1,14 @@
-from __future__ import division
-from __future__ import print_function
-
-from argparse import ArgumentParser
-from datetime import datetime, timedelta
-import json
 import os.path
-import sched
 import time
-from threading import Thread
+from argparse import ArgumentParser
+from datetime import timedelta
 
-import dateutil.parser
-from dateutil.tz import tzutc
-import requests
-from sseclient import SSEClient
 from ruamel import yaml
 
 from .audio import AudioController
 from .magicq import MagicqController
-
-
-audio_controller = AudioController()
-magicq_controller = None
-current_generation = 0
-exclusivity_groups = {}
+from .mixtape import Mixtape
+from .scheduling import Scheduler
 
 
 def parse_args():
@@ -34,8 +20,18 @@ def parse_args():
     play.add_argument('mixtape')
     play.add_argument('api')
     play.add_argument('stream')
-    play.add_argument('--latency', '-l', type=int, default=950,
-                      help='In milliseconds.')
+    play.add_argument(
+        '--latency',
+        '-l',
+        type=int,
+        default=950,
+        help='In milliseconds.',
+    )
+    play.add_argument(
+        '--audio-backend',
+        default='coreaudio',
+        help="Audio backend passed to `sox`",
+    )
     play.set_defaults(command='play')
 
     verify = subparsers.add_parser('verify', help='Verify the mixtape.')
@@ -49,111 +45,27 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_match_schedule(base_url, start_time):
-    url = '{}/matches'.format(base_url)
-    params = {
-        'slot_start_time': start_time.isoformat() + '..'
-    }
-    return requests.get(url, params=params).json()
-
-
-def play_track(filename, magicq_playback, magicq_cue, generation_number, output_device, group, trim_start):
-    global exclusivity_groups
-
-    if generation_number != current_generation:
-        return
-
-    if magicq_cue is not None:
-        magicq_controller.jump_to_cue(magicq_playback, magicq_cue, 0)
-
-    if filename is not None:
-        if group is not None:
-            existing_process = exclusivity_groups.get(group, None)
-            if existing_process is not None:
-                existing_process.terminate()
-
-        process = audio_controller.play(filename, output_device, trim_start)
-
-        if group is not None:
-            exclusivity_groups[group] = process
-
-
 def play(args):
-    global current_generation, magicq_controller, magicq_playback
-
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
 
+    magicq_controller = None
     if 'magicq' in playlist:
         config = playlist['magicq']
         magicq_controller = MagicqController((config['host'], config['port']))
-        magicq_playback = config['playback']
 
-    prev_match = None
+    audio_controller = AudioController(args.audio_backend)
 
-    stream = SSEClient(args.stream)
-    for message in stream:
-        if message.event == 'match':
-            matches = json.loads(message.data)
-            if matches:
-                match = matches[0]
+    mixtape = Mixtape(args.mixtape, playlist, audio_controller, magicq_controller)
 
-            if not matches:
-                try:
-                    match = get_match_schedule(args.api, datetime.now(tzutc()))['matches'][0]
-                except (KeyError, IndexError):
-                    print('Waiting for a match.')
-                    continue
+    scheduler = Scheduler(
+        api_url=args.api,
+        stream_url=args.stream,
+        latency=timedelta(seconds=args.latency / 1000),
+        generate_actions=mixtape.generate_play_actions,
+    )
 
-            if prev_match is not None:
-                if match['num'] == prev_match['num']:
-                    if match['times']['game']['start'] == prev_match['times']['game']['start']:
-                        continue
-
-            current_generation += 1
-
-            num = match['num']
-            print("Entering period for match", num)
-            tracks = playlist['tracks'].get(num, []) + playlist.get('all', [])
-
-            game_start = dateutil.parser.parse(match['times']['game']['start']) - timedelta(seconds=args.latency / 1000)
-
-            def current_offset():
-                return (datetime.now(tzutc()) - game_start).total_seconds()
-
-            schedule = sched.scheduler(current_offset, time.sleep)
-            for track in tracks:
-                try:
-                    magicq_cue = None
-                    path = os.path.join(args.mixtape, track['filename'])
-
-                    # load into filesystem cache
-                    with open(path, 'rb') as file:
-                        file.read(1)
-                except KeyError:
-                    magicq_cue = track['magicq_cue']
-                    magicq_playback = track['magicq_playback']
-                    path = None
-
-                trim_start = 0
-                if track['start'] < current_offset():
-                    trim_start = current_offset() - track['start']
-
-                output_device = track.get('output_device', None)
-                group = track.get('group', None)
-
-                name = path or f'MagicQ({magicq_playback}, {magicq_cue})'
-
-                print('Scheduling', name, 'for', track['start'])
-                schedule.enterabs(track['start'], 0, play_track,
-                                  argument=(path, magicq_playback, magicq_cue, current_generation,
-                                            output_device, group, trim_start))
-
-            thread = Thread(target=schedule.run)
-            thread.daemon = True
-            thread.start()
-
-            prev_match = match
+    scheduler.run()
 
 
 def verify_tracks(mixtape_dir, tracks):
@@ -186,7 +98,7 @@ def test(args):
 
     magicq_controller.jump_to_cue(4, 2, 0)
     time.sleep(1)
-    #magicq_controller.jump_to_cue(3, 2, 0)
+    # magicq_controller.jump_to_cue(3, 2, 0)
 
 
 def main():
