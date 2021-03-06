@@ -30,5 +30,5 @@ The configuration for a track is a list of triggers, each of which is a dictiona
 - ``filename`` is the path to a WAV file to play, relative to the mixtape directory.
 - ``output_device`` is the Audio device to send the output to.
 - ``magicq_cue`` is the MagicQ cue ID to send.
-- ``magicq_playlist`` is the MagicQ playlist ID to send.
+- ``magicq_playback`` is the MagicQ playlist ID to send.
 - ``group`` (optional) is the exclusivity group to assign this trigger to; only one sound from a given exclusivity group can be playing at a time.
