@@ -1,8 +1,8 @@
 import datetime
 import json
 import sched
-import time
 import threading
+import time
 from typing import (
     Callable,
     Iterable,
@@ -16,7 +16,7 @@ from typing import (
 
 import dateutil.parser
 import requests
-import sseclient
+import sseclient  # type: ignore[import]
 from dateutil.tz import tzutc
 
 TLA = NewType('TLA', str)
@@ -59,7 +59,7 @@ class Match(TypedDict):
     scores: object
     teams: List[TLA]
     times: Times
-    type: object
+    type: object  # noqa:A003
 
 
 class MatchSchedule(TypedDict):
