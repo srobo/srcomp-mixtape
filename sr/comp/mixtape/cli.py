@@ -12,7 +12,7 @@ from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
 
 
-def parse_args():
+def get_parser():
     parser = ArgumentParser(__name__)
 
     subparsers = parser.add_subparsers(help='Command to run.')
@@ -61,7 +61,7 @@ def parse_args():
     )
     test.set_defaults(command='test')
 
-    return parser.parse_args()
+    return parser
 
 
 def play(args):
@@ -137,7 +137,13 @@ def test(args):
 
 
 def main():
-    args = parse_args()
+    parser = get_parser()
+    args = parser.parse_args()
+
+    if 'command' not in args:
+        parser.print_help()
+        return
+
     if args.command == 'play':
         play(args)
     elif args.command == 'verify':
