@@ -49,7 +49,10 @@ def parse_args():
 
     test = subparsers.add_parser(
         'test',
-        help='Test that the MagicQ configuration can control the lighting.',
+        help=(
+            'Test that the MagicQ configuration can control the lighting '
+            'by triggering cue 2 of playback 4.'
+        ),
     )
     test.add_argument(
         'mixtape',
