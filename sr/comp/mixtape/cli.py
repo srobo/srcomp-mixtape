@@ -34,11 +34,17 @@ def parse_args():
     )
     play.set_defaults(command='play')
 
-    verify = subparsers.add_parser('verify', help='Verify the mixtape.')
+    verify = subparsers.add_parser(
+        'verify',
+        help='Verify the audio files in the mixtape are in found.',
+    )
     verify.add_argument('mixtape')
     verify.set_defaults(command='verify')
 
-    test = subparsers.add_parser('test', help='Test the mixtape.')
+    test = subparsers.add_parser(
+        'test',
+        help='Test that the MagicQ configuration can control the lighting.',
+    )
     test.add_argument('mixtape')
     test.set_defaults(command='test')
 
