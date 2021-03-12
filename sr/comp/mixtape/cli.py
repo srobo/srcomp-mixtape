@@ -81,6 +81,7 @@ def play(args):
             config['port'],
             config['password'],
             config['source_name'],
+            config['scene_name'],
         )
 
     audio_controller = AudioController(args.audio_backend)

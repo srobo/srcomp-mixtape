@@ -1,4 +1,5 @@
 import threading
+import time
 from types import TracebackType
 from typing import Generic, Optional, Type, TypeVar
 
@@ -37,11 +38,19 @@ class OBSStudioController:
     See https://github.com/Palakis/obs-websocket for the plugin's details.
     """
 
-    def __init__(self, host: str, port: int, password: str, source: str) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        password: str,
+        source: str,
+        scene: str,
+    ) -> None:
         websocket = obsws(host, port, password)
         websocket.connect()
 
         self.source_name = source
+        self.scene_name = scene
         self.video_info = websocket.call(requests.GetVideoInfo())
 
         # Our play_video method is going to be called from one of the (possibly
@@ -71,3 +80,12 @@ class OBSStudioController:
                     'y': self.video_info.getBaseHeight(),
                 },
             ))
+
+            # Rely on stopping the media also resetting back to the start
+            websocket.call(requests.StopMedia(self.source_name))
+
+            # TODO: remove this hardcoding
+            time.sleep(2)
+
+            websocket.call(requests.SetCurrentScene(self.scene_name))
+            websocket.call(requests.RestartMedia(self.source_name))
