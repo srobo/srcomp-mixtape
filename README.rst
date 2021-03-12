@@ -49,9 +49,7 @@ Track configuration
 
 The configuration for a track is a list of triggers, each of which is a dictionary containing the following keys:
 
-- ``start`` is the time of the trigger, in seconds, relative to the game start time.
-
-Note: This value can be negative to represent actions up to 30 seconds before the start of the match
+- ``start`` is the time of the trigger, in seconds, relative to the game start time. Note: This value can be negative to represent actions before the start of the match. The limit is the pre-match time defined in the compstate schedule.
 
 And either:
 
