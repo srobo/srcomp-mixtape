@@ -41,14 +41,20 @@ def parse_args():
         'verify',
         help='Verify the audio files in the mixtape are in found.',
     )
-    verify.add_argument('mixtape')
+    verify.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
     verify.set_defaults(command='verify')
 
     test = subparsers.add_parser(
         'test',
         help='Test that the MagicQ configuration can control the lighting.',
     )
-    test.add_argument('mixtape')
+    test.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
     test.set_defaults(command='test')
 
     return parser.parse_args()
