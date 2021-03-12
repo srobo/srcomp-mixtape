@@ -19,6 +19,7 @@ setup(
         'python-dateutil >=2.4, <3',
         'typing-extensions >=3.7.4.3, <4',
     ],
+    python_requires='>=3.7',
     entry_points={
         'console_scripts': [
             'srcomp-mixtape = sr.comp.mixtape.cli:main',
