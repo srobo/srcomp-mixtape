@@ -26,7 +26,7 @@ class Mixtape:
         magicq_controller: Optional[MagicqController],
         obs_studio_controller: Optional[OBSStudioController],
     ) -> None:
-        self.root = root
+        self.root = os.path.abspath(root)
         self.playlist = playlist
         self.audio_controller = audio_controller
         self.exclusivity_groups: Dict[object, subprocess.Popen[bytes]] = {}
