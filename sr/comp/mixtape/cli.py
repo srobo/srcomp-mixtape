@@ -18,9 +18,12 @@ def parse_args():
     subparsers = parser.add_subparsers(help='Command to run.')
 
     play = subparsers.add_parser('play', help='Play the mixtape.')
-    play.add_argument('mixtape')
-    play.add_argument('api')
-    play.add_argument('stream')
+    play.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
+    play.add_argument('api', help='URL of the SRComp HTTP API')
+    play.add_argument('stream', help='URL of the SRComp event stream')
     play.add_argument(
         '--latency',
         '-l',
@@ -35,12 +38,27 @@ def parse_args():
     )
     play.set_defaults(command='play')
 
-    verify = subparsers.add_parser('verify', help='Verify the mixtape.')
-    verify.add_argument('mixtape')
+    verify = subparsers.add_parser(
+        'verify',
+        help='Verify the audio files in the mixtape are in found.',
+    )
+    verify.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
     verify.set_defaults(command='verify')
 
-    test = subparsers.add_parser('test', help='Test the mixtape.')
-    test.add_argument('mixtape')
+    test = subparsers.add_parser(
+        'test',
+        help=(
+            'Test that the MagicQ configuration can control the lighting '
+            'by triggering cue 2 of playback 4.'
+        ),
+    )
+    test.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
     test.set_defaults(command='test')
 
     return parser.parse_args()

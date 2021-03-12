@@ -1,12 +1,12 @@
 import functools
 import os.path
 import subprocess
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, Optional, Tuple
 
 from .audio import AudioController
 from .magicq import MagicqController
 from .obs_studio import OBSStudioController
-from .scheduling import Action
+from .scheduling import Action, ActionSpec, Match
 
 
 def preload(filename: str):
@@ -52,7 +52,13 @@ class Mixtape:
 
         return action, name
 
-    def play_track(self, filename, output_device, group, trim_start):
+    def play_track(
+        self,
+        filename: str,
+        output_device: str,
+        group: Optional[object],
+        trim_start: float,
+    ) -> None:
         if group is not None:
             existing_process = self.exclusivity_groups.get(group, None)
             if existing_process is not None:
@@ -110,7 +116,11 @@ class Mixtape:
 
         return action, name
 
-    def generate_play_actions(self, current_offset, match):
+    def generate_play_actions(
+        self,
+        current_offset: Callable[[], float],
+        match: Match,
+    ) -> Iterator[ActionSpec]:
         num = match['num']
         tracks = self.playlist['tracks'].get(num, []) + self.playlist.get('all', [])
 

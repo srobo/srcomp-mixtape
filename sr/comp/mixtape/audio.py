@@ -3,10 +3,15 @@ import subprocess
 
 class AudioController:
 
-    def __init__(self, audio_backend):
+    def __init__(self, audio_backend: str) -> None:
         self.audio_backend = audio_backend
 
-    def play(self, filename, output_device, trim_start):
+    def play(
+        self,
+        filename: str,
+        output_device: str,
+        trim_start: float,
+    ) -> subprocess.Popen[bytes]:
         print('Playing', filename)
         args = ['sox', filename, '-t', self.audio_backend]
         if output_device is not None:

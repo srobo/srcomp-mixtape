@@ -55,13 +55,13 @@ Track configuration
 
 The configuration for a track is a list of triggers, each of which is a dictionary containing the following keys:
 
-- ``start`` is the time of the trigger, in seconds, relative to the game start time.
-- ``group`` (optional) is the exclusivity group to assign this trigger to; only one sound from a given exclusivity group can be playing at a time.
+- ``start`` is the time of the trigger, in seconds, relative to the game start time. Note: This value can be negative to represent actions before the start of the match. The limit is the pre-match time defined in the compstate schedule.
 
 And either:
 
 - ``filename`` is the path to a WAV file to play, relative to the mixtape directory.
 - ``output_device`` is the Audio device to send the output to.
+- ``group`` (optional) is the exclusivity group to assign this trigger to; only one sound from a given exclusivity group can be playing at a time.
 
 Or:
 

@@ -1,0 +1,30 @@
+magicq:
+  host: 127.0.0.1
+  port: 6553  # default Chamsys MagicQ port
+all:
+  # An example lighting cue action
+  - start: -15              # Time, in seconds, relative to the match start time
+    magicq_playback: 1      # The playback number in MagicQ
+    magicq_cue: 7           # The cue number within the playback
+  # An example audio action
+  - start: -2               # Time, in seconds, relative to the match start time
+    filename: pre-match.wav # The audio file to play in the same folder as playlist.yaml
+    output_device: alsa     # The output device to use, for linux this is alsa for MacOS this is coreaudio
+    group: start-sounds     # The optional group to play the sound in, a new trigger in this group will stop the sound
+  # Second audio cue in same group, this will halt the sound above
+  - start: 0
+    filename: match_start.wav
+    output_device:
+    group: start-sounds
+  # End-of-match events (assuming 120s match)
+  - start: 120
+    magicq_playback: 2
+    magicq_cue: 1
+  - start: 120
+    filename: match-end.wav
+    output_device: alsa
+tracks:
+  0:  # run a special lighting cue for the first match
+    - start: -5
+      magicq_playback: 1
+      magicq_cue: 2
