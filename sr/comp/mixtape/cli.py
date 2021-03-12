@@ -17,9 +17,12 @@ def parse_args():
     subparsers = parser.add_subparsers(help='Command to run.')
 
     play = subparsers.add_parser('play', help='Play the mixtape.')
-    play.add_argument('mixtape')
-    play.add_argument('api')
-    play.add_argument('stream')
+    play.add_argument(
+        'mixtape',
+        help='The folder containing the playlist.yaml and audio files',
+    )
+    play.add_argument('api', help='URL of the SRComp HTTP API')
+    play.add_argument('stream', help='URL of the SRComp event stream')
     play.add_argument(
         '--latency',
         '-l',
