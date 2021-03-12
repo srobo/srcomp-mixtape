@@ -3,17 +3,8 @@ import json
 import sched
 import threading
 import time
-from typing import (
-    Callable,
-    cast,
-    Iterable,
-    List,
-    NewType,
-    Optional,
-    Protocol,
-    Tuple,
-)
-from typing_extensions import TypedDict
+from typing import Callable, cast, Iterable, List, NewType, Optional, Tuple
+from typing_extensions import Protocol, TypedDict
 
 import dateutil.parser
 import requests
