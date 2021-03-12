@@ -51,6 +51,8 @@ The configuration for a track is a list of triggers, each of which is a dictiona
 
 - ``start`` is the time of the trigger, in seconds, relative to the game start time.
 
+Note: This value can be negative to represent actions up to 30 seconds before the start of the match
+
 And either:
 
 - ``filename`` is the path to a WAV file to play, relative to the mixtape directory.
