@@ -49,6 +49,7 @@ time it takes to decode compressed audio, which can throw off timings.
     - ``port``: the websocket port for the (probably `4444`)
     - ``password``: the password for the websocket
     - ``source_name``: the name of the "Source" within OBS Studio that will play the videos
+    - ``scene_name``: the name of the "Scene" within OBS Studio that contains the above Source
 
 Track configuration
 -------------------
@@ -71,6 +72,8 @@ Or:
 Or:
 
 - ``obs_video`` is the path to a video file which should be played by OBS Studio.
+  The track start should be set to -2 seconds as the playback includes a transition
+  to the scene ahead of the start of the match.
 
 
 .. |Build Status| image:: https://circleci.com/gh/srobo/srcomp-mixtape.svg?style=svg
