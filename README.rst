@@ -47,8 +47,10 @@ time it takes to decode compressed audio, which can throw off timings.
     installed. This requires the following nested keys:
     - ``port``: the websocket port for the (probably `4444`)
     - ``password``: the password for the websocket
-    - ``source_name``: the name of the "Source" within OBS Studio that will play the videos
-    - ``scene_name``: the name of the "Scene" within OBS Studio that contains the above Source
+    - ``source_name``: the name of the "Source" within OBS Studio that will play the videos.
+        The source being controlled the option "Close file when inactive" needs to be set to allow the source to be changed when not active.
+    - ``scene_name``: the name of the "Scene" within OBS Studio that contains the above Source.
+        The scene being transitioned to needs "Transition Override > Fade" selected so there is a fade.
 
 Track configuration
 -------------------
