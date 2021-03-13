@@ -108,7 +108,10 @@ def verify_tracks(mixtape_dir, tracks):
         try:
             filename = track['filename']
         except KeyError:
-            continue
+            try:
+                filename = track['obs_video']
+            except KeyError:
+                continue
         path = os.path.join(mixtape_dir, filename)
         if not os.path.exists(path):
             print(path, "doesn't exist!")
