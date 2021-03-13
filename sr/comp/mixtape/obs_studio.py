@@ -7,6 +7,8 @@ from obswebsocket import obsws, requests  # type: ignore[import]
 
 T = TypeVar('T')
 
+PLAY, PAUSE = False, True
+
 
 class Guarded(Generic[T]):
     """
@@ -81,11 +83,12 @@ class OBSStudioController:
                 },
             ))
 
-            # Rely on stopping the media also resetting back to the start
-            websocket.call(requests.StopMedia(self.source_name))
+            websocket.call(requests.PlayPauseMedia(self.source_name, PAUSE))
+            websocket.call(requests.ScrubMedia(self.source_name, 0))
+
+            websocket.call(requests.SetCurrentScene(self.scene_name))
 
             # TODO: remove this hardcoding
             time.sleep(2)
 
-            websocket.call(requests.SetCurrentScene(self.scene_name))
-            websocket.call(requests.RestartMedia(self.source_name))
+            websocket.call(requests.PlayPauseMedia(self.source_name, PLAY))
