@@ -43,7 +43,15 @@ time it takes to decode compressed audio, which can throw off timings.
 - ``magicq`` defines the MagicQ connection settings, for automatic triggering of lights.
 - ``tracks`` defines the triggers and tracks to be played in a specific match, as a giant dictionary of the match number to track configuration.
 - ``all`` defines the triggers and tracks to be played in *every* match, in the same format as a single match in ``tracks``.
-
+- ``obs_studio`` defines the connection settings to an instance of OBS Studio
+    which has the `obs-websocket plugin <https://github.com/Palakis/obs-websocket>`_
+    installed. This requires the following nested keys:
+    - ``port``: the websocket port for the (probably `4444`)
+    - ``password``: the password for the websocket
+    - ``source_name``: the name of the "Source" within OBS Studio that will play the videos.
+        The source being controlled the option "Close file when inactive" needs to be set to allow the source to be changed when not active.
+    - ``scene_name``: the name of the "Scene" within OBS Studio that contains the above Source.
+        The scene being transitioned to needs "Transition Override > Fade" selected so there is a fade.
 
 Track configuration
 -------------------
@@ -62,6 +70,12 @@ Or:
 
 - ``magicq_cue`` is the MagicQ cue ID to send.
 - ``magicq_playback`` is the MagicQ playlist ID to send.
+
+Or:
+
+- ``obs_video`` is the path to a video file which should be played by OBS Studio.
+  The track start should be set to -2 seconds as the playback includes a transition
+  to the scene ahead of the start of the match.
 
 
 .. |Build Status| image:: https://circleci.com/gh/srobo/srcomp-mixtape.svg?style=svg

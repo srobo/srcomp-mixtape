@@ -8,6 +8,7 @@ from ruamel import yaml
 from .audio import AudioController
 from .magicq import MagicqController
 from .mixtape import Mixtape
+from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
 
 
@@ -72,9 +73,25 @@ def play(args):
         config = playlist['magicq']
         magicq_controller = MagicqController((config['host'], config['port']))
 
+    obs_controller = None
+    if 'obs_studio' in playlist:
+        config = playlist['obs_studio']
+        obs_controller = OBSStudioController(
+            config['port'],
+            config['password'],
+            config['source_name'],
+            config['scene_name'],
+        )
+
     audio_controller = AudioController(args.audio_backend)
 
-    mixtape = Mixtape(args.mixtape, playlist, audio_controller, magicq_controller)
+    mixtape = Mixtape(
+        args.mixtape,
+        playlist,
+        audio_controller,
+        magicq_controller,
+        obs_controller,
+    )
 
     scheduler = Scheduler(
         api_url=args.api,

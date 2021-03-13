@@ -16,6 +16,7 @@ setup(
         'requests >=2.5, <3',
         'ruamel.yaml >=0.15, <0.16',
         'sseclient >=0.0, <1',
+        'obs-websocket-py >=0.5.3, <0.6',
         'python-dateutil >=2.4, <3',
         'typing-extensions >=3.7.4.3, <4',
     ],
