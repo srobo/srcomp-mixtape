@@ -45,7 +45,6 @@ time it takes to decode compressed audio, which can throw off timings.
 - ``obs_studio`` defines the connection settings to an instance of OBS Studio
     which has the `obs-websocket plugin <https://github.com/Palakis/obs-websocket>`_
     installed. This requires the following nested keys:
-    - ``host``: the websocket host for the (probably `localhost`)
     - ``port``: the websocket port for the (probably `4444`)
     - ``password``: the password for the websocket
     - ``source_name``: the name of the "Source" within OBS Studio that will play the videos

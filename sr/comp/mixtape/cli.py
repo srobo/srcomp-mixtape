@@ -77,7 +77,6 @@ def play(args):
     if 'obs_studio' in playlist:
         config = playlist['obs_studio']
         obs_controller = OBSStudioController(
-            config['host'],
             config['port'],
             config['password'],
             config['source_name'],

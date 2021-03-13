@@ -42,13 +42,12 @@ class OBSStudioController:
 
     def __init__(
         self,
-        host: str,
         port: int,
         password: str,
         source: str,
         scene: str,
     ) -> None:
-        websocket = obsws(host, port, password)
+        websocket = obsws('localhost', port, password)
         websocket.connect()
 
         self.source_name = source
