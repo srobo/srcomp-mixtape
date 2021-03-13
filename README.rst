@@ -12,6 +12,7 @@ Install the library using:
 
 .. code:: shell
 
+    pip install -U pip setuptools wheel
     pip install git+https://github.com/srobo/srcomp-mixtape
 
 
