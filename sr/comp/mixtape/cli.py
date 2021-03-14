@@ -7,7 +7,7 @@ from ruamel import yaml
 
 from .audio import AudioController
 from .magicq import MagicqController
-from .mixtape import Mixtape
+from .mixtape import Mixtape, populate_filename_placeholder
 from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
 
@@ -40,11 +40,15 @@ def get_parser():
 
     verify = subparsers.add_parser(
         'verify',
-        help='Verify the audio files in the mixtape are in found.',
+        help='Verify the audio files in the mixtape are found.',
     )
     verify.add_argument(
         'mixtape',
         help='The folder containing the playlist.yaml and audio files',
+    )
+    verify.add_argument(
+        '--matches',
+        help='The range of match numbers to test placeholders with',
     )
     verify.set_defaults(command='verify')
 
@@ -104,7 +108,18 @@ def play(args):
     scheduler.run()
 
 
-def verify_tracks(mixtape_dir, tracks):
+def verify_track(mixtape_dir, filename):
+    path = os.path.join(mixtape_dir, filename)
+    if not os.path.exists(path):
+        print(path, "doesn't exist!")
+
+
+def verify_tracks(mixtape_dir, tracks, matches):
+    if matches:
+        match_range = matches.split('-')
+        match_start = int(match_range[0])
+        match_end = int(match_range[1])
+
     for track in tracks:
         try:
             filename = track['filename']
@@ -112,13 +127,19 @@ def verify_tracks(mixtape_dir, tracks):
             try:
                 filename = track['obs_video']
                 if '{match' in filename:
-                    print('Video file name contains a match placeholder, this is not tested')
+                    if matches:
+                        for match in range(match_start, match_end + 1):
+                            match_filename = populate_filename_placeholder(filename, match)
+                            verify_track(mixtape_dir, match_filename)
+                    else:
+                        print(
+                            'Video file name contains a match placeholder, '
+                            'please use --matches to test this',
+                        )
                     continue
             except KeyError:
                 continue
-        path = os.path.join(mixtape_dir, filename)
-        if not os.path.exists(path):
-            print(path, "doesn't exist!")
+        verify_track(mixtape_dir, filename)
 
 
 def verify(args):
@@ -126,9 +147,9 @@ def verify(args):
         playlist = yaml.safe_load(file)
 
     for num, tracks in playlist['tracks'].items():
-        verify_tracks(args.mixtape, tracks)
+        verify_tracks(args.mixtape, tracks, args.matches)
 
-    verify_tracks(args.mixtape, playlist.get('all', []))
+    verify_tracks(args.mixtape, playlist.get('all', []), args.matches)
 
 
 def test(args):
