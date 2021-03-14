@@ -76,8 +76,8 @@ Or:
 Or:
 
 - ``obs_video`` is the path to a video file which should be played by OBS Studio.
-  The track start should be set to -preload_time seconds as the playback includes a transition
-  to the scene ahead of the start of the match.
+  The track start corresponds to the point where the video begins playing.
+  The video will be loaded and transitioned to ``preload_time`` seconds before this.
 
 
 .. |Build Status| image:: https://circleci.com/gh/srobo/srcomp-mixtape.svg?style=svg

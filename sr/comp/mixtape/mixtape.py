@@ -33,13 +33,29 @@ class Mixtape:
         self.magicq_controller = magicq_controller
         self.obs_studio_controller = obs_studio_controller
 
+    def get_load_video_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+    ) -> Tuple[Action, float]:
+        path = os.path.join(self.root, track['obs_video'])
+        preload(path)
+
+        if self.obs_studio_controller is None:
+            raise ValueError(f"Need a obs_studio_controller to play {path}")
+        controller = self.obs_studio_controller
+
+        def action() -> None:
+            controller.load_video(path)
+
+        return action, controller.preload_time
+
     def get_play_video_action(
         self,
         track: Any,
         current_offset: Callable[[], float],
     ) -> Tuple[Action, str]:
         path = os.path.join(self.root, track['obs_video'])
-        preload(path)
 
         if self.obs_studio_controller is None:
             raise ValueError(f"Need a obs_studio_controller to play {path}")
@@ -48,7 +64,7 @@ class Mixtape:
         name = f'OBSStudio({path})'
 
         def action() -> None:
-            controller.play_video(path)
+            controller.play_video()
 
         return action, name
 
@@ -130,6 +146,10 @@ class Mixtape:
             elif 'magicq_playback' in track:
                 action, name = self.get_run_cue_action(track, current_offset)
             elif 'obs_video' in track:
+                load_action, preload_time = self.get_load_video_action(track, current_offset)
+                # priority 1 used since timing of load not critical
+                # and we don't want to delay other actions
+                yield track['start'] - preload_time, 1, load_action
                 action, name = self.get_play_video_action(track, current_offset)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")

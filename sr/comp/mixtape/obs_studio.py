@@ -1,5 +1,4 @@
 import threading
-import time
 from types import TracebackType
 from typing import Generic, Optional, Type, TypeVar
 
@@ -61,7 +60,7 @@ class OBSStudioController:
         # concurrent access.
         self.websocket = Guarded(websocket)
 
-    def play_video(self, filename: str) -> None:
+    def load_video(self, filename: str) -> None:
         with self.websocket as websocket:
             websocket.call(requests.SetSourceSettings(
                 self.source_name,
@@ -89,7 +88,6 @@ class OBSStudioController:
 
             websocket.call(requests.SetCurrentScene(self.scene_name))
 
-            # TODO: remove this hardcoding
-            time.sleep(self.preload_time)
-
+    def play_video(self) -> None:
+        with self.websocket as websocket:
             websocket.call(requests.PlayPauseMedia(self.source_name, PLAY))
