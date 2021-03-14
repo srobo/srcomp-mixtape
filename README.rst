@@ -78,6 +78,10 @@ Or:
   The track start should be set to -2 seconds as the playback includes a transition
   to the scene ahead of the start of the match.
 
+Or:
+
+-  ``obs_scene`` is the scene name to transistion to.
+    The scene being transitioned to needs "Transition Override > Fade" selected so there is a fade.
 
 .. |Build Status| image:: https://circleci.com/gh/srobo/srcomp-mixtape.svg?style=svg
    :target: https://circleci.com/gh/srobo/srcomp-mixtape

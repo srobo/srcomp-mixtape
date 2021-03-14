@@ -91,3 +91,7 @@ class OBSStudioController:
             time.sleep(2)
 
             websocket.call(requests.PlayPauseMedia(self.source_name, PLAY))
+
+    def transition_scene(self, scene_name: str) -> None:
+        with self.websocket as websocket:
+            websocket.call(requests.SetCurrentScene(scene_name))
