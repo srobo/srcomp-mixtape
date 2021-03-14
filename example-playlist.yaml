@@ -36,3 +36,6 @@ tracks:
   1:  # play recorded video in OBS for match 1
     - start: -2
       obs_video: 'match-1.mp4'
+    # Transition to another scene after the match (assuming 120s match)
+    - start: 120
+      obs_scene: Out Of Matcn
