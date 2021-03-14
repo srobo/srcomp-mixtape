@@ -17,6 +17,13 @@ def preload(filename: str):
         f.read(1)
 
 
+def populate_filename_placeholder(filename: str, match_num: int) -> str:
+    try:
+        return filename.format(match=match_num)
+    except KeyError:
+        return filename
+
+
 class Mixtape:
     def __init__(
         self,
@@ -37,8 +44,10 @@ class Mixtape:
         self,
         track: Any,
         current_offset: Callable[[], float],
+        match_num: int,
     ) -> Tuple[Action, float]:
-        path = os.path.join(self.root, track['obs_video'])
+        filename = populate_filename_placeholder(track['obs_video'], match_num)
+        path = os.path.join(self.root, filename)
         preload(path)
 
         if self.obs_studio_controller is None:
@@ -58,8 +67,10 @@ class Mixtape:
         self,
         track: Any,
         current_offset: Callable[[], float],
+        match_num: int,
     ) -> Tuple[Action, str]:
-        path = os.path.join(self.root, track['obs_video'])
+        filename = populate_filename_placeholder(track['obs_video'], match_num)
+        path = os.path.join(self.root, filename)
 
         if self.obs_studio_controller is None:
             raise ValueError(f"Need a obs_studio_controller to play {path}")
@@ -168,13 +179,15 @@ class Mixtape:
             elif 'magicq_playback' in track:
                 action, name = self.get_run_cue_action(track, current_offset)
             elif 'obs_video' in track:
-                load_action, preroll_time = self.get_load_video_action(track, current_offset)
+                load_action, preroll_time = self.get_load_video_action(
+                    track,
+                    current_offset,
+                    num,
+                )
                 # priority 1 used since timing of load not critical
                 # and we don't want to delay other actions
                 yield track['start'] - preroll_time, 1, load_action
-                action, name = self.get_play_video_action(track, current_offset)
-            elif 'obs_scene' in track:
-                action, name = self.get_transition_scene_action(track, current_offset)
+                action, name = self.get_play_video_action(track, current_offset, num)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
