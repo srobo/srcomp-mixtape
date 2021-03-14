@@ -46,12 +46,14 @@ class OBSStudioController:
         password: str,
         source: str,
         scene: str,
+        preload_time: float,
     ) -> None:
         websocket = obsws('localhost', port, password)
         websocket.connect()
 
         self.source_name = source
         self.scene_name = scene
+        self.preload_time = preload_time
         self.video_info = websocket.call(requests.GetVideoInfo())
 
         # Our play_video method is going to be called from one of the (possibly
@@ -88,6 +90,6 @@ class OBSStudioController:
             websocket.call(requests.SetCurrentScene(self.scene_name))
 
             # TODO: remove this hardcoding
-            time.sleep(2)
+            time.sleep(self.preload_time)
 
             websocket.call(requests.PlayPauseMedia(self.source_name, PLAY))
