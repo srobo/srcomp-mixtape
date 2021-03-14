@@ -111,6 +111,9 @@ def verify_tracks(mixtape_dir, tracks):
         except KeyError:
             try:
                 filename = track['obs_video']
+                if '{match' in filename:
+                    print('Video file name contains a match placeholder, this is not tested')
+                    continue
             except KeyError:
                 continue
         path = os.path.join(mixtape_dir, filename)
