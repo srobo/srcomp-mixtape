@@ -81,7 +81,7 @@ def play(args):
             config['password'],
             config['source_name'],
             config['scene_name'],
-            config.get('preload_time', 2),
+            config.get('preroll_time', 2),
         )
 
     audio_controller = AudioController(args.audio_backend)

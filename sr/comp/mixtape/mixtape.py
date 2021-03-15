@@ -48,7 +48,7 @@ class Mixtape:
         def action() -> None:
             controller.load_video(path)
 
-        return action, controller.preload_time
+        return action, controller.preroll_time
 
     def get_play_video_action(
         self,
@@ -146,10 +146,10 @@ class Mixtape:
             elif 'magicq_playback' in track:
                 action, name = self.get_run_cue_action(track, current_offset)
             elif 'obs_video' in track:
-                load_action, preload_time = self.get_load_video_action(track, current_offset)
+                load_action, preroll_time = self.get_load_video_action(track, current_offset)
                 # priority 1 used since timing of load not critical
                 # and we don't want to delay other actions
-                yield track['start'] - preload_time, 1, load_action
+                yield track['start'] - preroll_time, 1, load_action
                 action, name = self.get_play_video_action(track, current_offset)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
