@@ -38,4 +38,4 @@ tracks:
       obs_video: 'match-1.mp4'
     # Transition to another scene after the match (assuming 120s match)
     - start: 120
-      obs_scene: Out Of Matcn
+      obs_scene: Out Of Match
