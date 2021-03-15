@@ -48,6 +48,10 @@ class Mixtape:
         def action() -> None:
             controller.load_video(path)
 
+        print(
+            f"Scheduling load OBSStudio({path}) for",
+            track['start'] - controller.preroll_time,
+        )
         return action, controller.preroll_time
 
     def get_play_video_action(
