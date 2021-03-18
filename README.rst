@@ -78,7 +78,7 @@ Or:
 - ``obs_video`` is the path to a video file which should be played by OBS Studio.
   The track start corresponds to the point where the video begins playing.
   The video will be loaded and transitioned to ``preload_time`` seconds before this.
-  ``obs_video`` also supports using the placeholder ``{match}`` in the filename given,
+  ``obs_video`` also supports using the placeholder ``{match_num}`` in the filename given,
   this is substituted for the match number each time the action is used.
 
 Or:

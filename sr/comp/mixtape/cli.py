@@ -126,7 +126,7 @@ def verify_tracks(mixtape_dir, tracks, matches):
         except KeyError:
             try:
                 filename = track['obs_video']
-                if '{match' in filename:
+                if '{match_num' in filename:
                     if matches:
                         for match in range(match_start, match_end + 1):
                             match_filename = populate_filename_placeholder(filename, match)

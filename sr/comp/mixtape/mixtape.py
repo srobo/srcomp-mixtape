@@ -19,7 +19,7 @@ def preload(filename: str):
 
 def populate_filename_placeholder(filename: str, match_num: int) -> str:
     try:
-        return filename.format(match=match_num)
+        return filename.format(match_num=match_num)
     except KeyError:
         return filename
 
