@@ -33,13 +33,33 @@ class Mixtape:
         self.magicq_controller = magicq_controller
         self.obs_studio_controller = obs_studio_controller
 
+    def get_load_video_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+    ) -> Tuple[Action, float]:
+        path = os.path.join(self.root, track['obs_video'])
+        preload(path)
+
+        if self.obs_studio_controller is None:
+            raise ValueError(f"Need a obs_studio_controller to play {path}")
+        controller = self.obs_studio_controller
+
+        def action() -> None:
+            controller.load_video(path)
+
+        print(
+            f"Scheduling load OBSStudio({path}) for",
+            track['start'] - controller.preroll_time,
+        )
+        return action, controller.preroll_time
+
     def get_play_video_action(
         self,
         track: Any,
         current_offset: Callable[[], float],
     ) -> Tuple[Action, str]:
         path = os.path.join(self.root, track['obs_video'])
-        preload(path)
 
         if self.obs_studio_controller is None:
             raise ValueError(f"Need a obs_studio_controller to play {path}")
@@ -48,7 +68,7 @@ class Mixtape:
         name = f'OBSStudio({path})'
 
         def action() -> None:
-            controller.play_video(path)
+            controller.play_video()
 
         return action, name
 
@@ -148,6 +168,10 @@ class Mixtape:
             elif 'magicq_playback' in track:
                 action, name = self.get_run_cue_action(track, current_offset)
             elif 'obs_video' in track:
+                load_action, preroll_time = self.get_load_video_action(track, current_offset)
+                # priority 1 used since timing of load not critical
+                # and we don't want to delay other actions
+                yield track['start'] - preroll_time, 1, load_action
                 action, name = self.get_play_video_action(track, current_offset)
             elif 'obs_scene' in track:
                 action, name = self.get_transition_scene_action(track, current_offset)
