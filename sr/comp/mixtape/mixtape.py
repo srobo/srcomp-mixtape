@@ -188,12 +188,12 @@ class Mixtape:
                         current_offset,
                         num,
                     )
-                    # priority 1 used since timing of load not critical
-                    # and we don't want to delay other actions
-                    yield track['start'] - preroll_time, 1, load_action
-                    action, name = self.get_play_video_action(track, current_offset, num)
                 except FileNotFoundError:
                     continue
+                # priority 1 used since timing of load not critical
+                # and we don't want to delay other actions
+                yield track['start'] - preroll_time, 1, load_action
+                action, name = self.get_play_video_action(track, current_offset, num)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
