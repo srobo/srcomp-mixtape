@@ -22,6 +22,9 @@ all:
     filename: match_start.wav
     output_device:
     group: start-sounds
+  # Run unique match videos for each match
+  - start: 0
+    obs_video: match-{match_num}.mp4
   # End-of-match events (assuming 120s match)
   - start: 120
     magicq_playback: 2

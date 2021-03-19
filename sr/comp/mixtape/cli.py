@@ -2,12 +2,13 @@ import os.path
 import time
 from argparse import ArgumentParser
 from datetime import timedelta
+from typing import List, Set
 
 from ruamel import yaml
 
 from .audio import AudioController
 from .magicq import MagicqController
-from .mixtape import Mixtape
+from .mixtape import Mixtape, populate_filename_placeholder
 from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
 
@@ -40,11 +41,16 @@ def get_parser():
 
     verify = subparsers.add_parser(
         'verify',
-        help='Verify the audio files in the mixtape are in found.',
+        help='Verify the audio files in the mixtape are found.',
     )
     verify.add_argument(
         'mixtape',
         help='The folder containing the playlist.yaml and audio files',
+    )
+    verify.add_argument(
+        '--matches',
+        help="List of matches or match ranges to test placeholders with, for example '1,3-5'.",
+        type=parse_ranges,
     )
     verify.set_defaults(command='verify')
 
@@ -62,6 +68,24 @@ def get_parser():
     test.set_defaults(command='test')
 
     return parser
+
+
+def parse_ranges(ranges: str) -> Set[int]:
+    """
+    Parse a comma seprated list of numbers which may include ranges
+    specified as hyphen-separated numbers.
+    From https://stackoverflow.com/questions/6405208
+    """
+    result: List[int] = []
+    for part in ranges.split(','):
+        if '-' in part:
+            a_, b_ = part.split('-')
+            a, b = int(a_), int(b_)
+            result.extend(range(a, b + 1))
+        else:
+            a = int(part)
+            result.append(a)
+    return set(result)
 
 
 def play(args):
@@ -104,18 +128,34 @@ def play(args):
     scheduler.run()
 
 
-def verify_tracks(mixtape_dir, tracks):
+def verify_track(mixtape_dir, filename):
+    path = os.path.join(mixtape_dir, filename)
+    if not os.path.exists(path):
+        print(path, "doesn't exist!")
+
+
+def verify_tracks(mixtape_dir, tracks, matches):
     for track in tracks:
         try:
             filename = track['filename']
         except KeyError:
             try:
                 filename = track['obs_video']
+                # The trailing brace is omitted so that placeholders with formatting are caught
+                if '{match_num' in filename:
+                    if matches:
+                        for match in matches:
+                            match_filename = populate_filename_placeholder(filename, match)
+                            verify_track(mixtape_dir, match_filename)
+                    else:
+                        print(
+                            'Video file name contains a match placeholder, '
+                            'please use --matches to test this',
+                        )
+                    continue
             except KeyError:
                 continue
-        path = os.path.join(mixtape_dir, filename)
-        if not os.path.exists(path):
-            print(path, "doesn't exist!")
+        verify_track(mixtape_dir, filename)
 
 
 def verify(args):
@@ -123,9 +163,9 @@ def verify(args):
         playlist = yaml.safe_load(file)
 
     for num, tracks in playlist['tracks'].items():
-        verify_tracks(args.mixtape, tracks)
+        verify_tracks(args.mixtape, tracks, args.matches)
 
-    verify_tracks(args.mixtape, playlist.get('all', []))
+    verify_tracks(args.mixtape, playlist.get('all', []), args.matches)
 
 
 def test(args):
