@@ -52,6 +52,24 @@ class Mixtape:
 
         return action, name
 
+    def get_transition_scene_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+    ) -> Tuple[Action, str]:
+        scene = track['obs_scene']
+
+        if self.obs_studio_controller is None:
+            raise ValueError(f"Need a obs_studio_controller to transistion to {scene}")
+        controller = self.obs_studio_controller
+
+        name = f'OBSStudio(scene={scene})'
+
+        def action() -> None:
+            controller.transition_scene(scene)
+
+        return action, name
+
     def play_track(
         self,
         filename: str,
@@ -131,6 +149,8 @@ class Mixtape:
                 action, name = self.get_run_cue_action(track, current_offset)
             elif 'obs_video' in track:
                 action, name = self.get_play_video_action(track, current_offset)
+            elif 'obs_scene' in track:
+                action, name = self.get_transition_scene_action(track, current_offset)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 

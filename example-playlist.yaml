@@ -1,3 +1,8 @@
+obs_studio:
+  port: 4444                  # The websocket port set in OBS
+  password: password          # The websocket password set in OBS
+  source_name: 'Media Source' # The name of the source which obs_video cues are played in
+  scene_name: Scene           # The name of the scene which the source is on
 magicq:
   host: 127.0.0.1
   port: 6553  # default Chamsys MagicQ port
@@ -28,3 +33,9 @@ tracks:
     - start: -5
       magicq_playback: 1
       magicq_cue: 2
+  1:  # play recorded video in OBS for match 1
+    - start: -2
+      obs_video: 'match-1.mp4'
+    # Transition to another scene after the match (assuming 120s match)
+    - start: 120
+      obs_scene: Out Of Match
