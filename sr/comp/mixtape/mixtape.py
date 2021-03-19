@@ -191,6 +191,8 @@ class Mixtape:
                 # and we don't want to delay other actions
                 yield track['start'] - preroll_time, 1, load_action
                 action, name = self.get_play_video_action(track, current_offset, num)
+            elif 'obs_scene' in track:
+                action, name = self.get_transition_scene_action(track, current_offset)
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
