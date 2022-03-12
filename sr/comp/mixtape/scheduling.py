@@ -69,7 +69,7 @@ class Scheduler:
         api_url: str,
         stream_url: str,
         latency: datetime.timedelta,
-        generate_actions: Callable[[CurrentOffset, Match], Iterable[ActionSpec]]
+        generate_actions: Callable[[CurrentOffset, Match], Iterable[ActionSpec]],
     ) -> None:
         self.api_url = api_url
         self.stream = sseclient.SSEClient(stream_url)
