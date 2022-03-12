@@ -27,6 +27,6 @@ setup(
         ],
     },
     setup_requires=[
-        'Sphinx >=1.3, <2',
+        'Sphinx >=1.3, <5',
     ],
 )
