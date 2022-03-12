@@ -19,7 +19,7 @@ class MagicqController:
 
     def send_command(self, command: str, retries: int = 5) -> None:
         packet = self.build_packet(command.encode('ascii'))
-        for retry in range(retries):
+        for _retry in range(retries):
             self.socket.sendto(packet, self.address)
 
     def activate_playback(self, num: int) -> None:

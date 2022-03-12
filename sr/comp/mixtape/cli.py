@@ -162,7 +162,7 @@ def verify(args):
     with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
 
-    for num, tracks in playlist['tracks'].items():
+    for tracks in playlist['tracks'].values():
         verify_tracks(args.mixtape, tracks, args.matches)
 
     verify_tracks(args.mixtape, playlist.get('all', []), args.matches)
