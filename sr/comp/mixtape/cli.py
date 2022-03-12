@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from datetime import timedelta
 from typing import List, Set
 
-from ruamel import yaml
+from ruamel import yaml  # type: ignore[import]
 
 from .audio import AudioController
 from .magicq import MagicqController
