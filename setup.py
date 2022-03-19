@@ -14,7 +14,7 @@ setup(
     author_email='srobo-devel@googlegroups.com',
     install_requires=[
         'requests >=2.5, <3',
-        'ruamel.yaml >=0.15, <0.16',
+        'ruamel.yaml >=0.15, <0.18',
         'sseclient >=0.0, <1',
         'obs-websocket-py >=0.5.3, <0.6',
         'python-dateutil >=2.4, <3',
