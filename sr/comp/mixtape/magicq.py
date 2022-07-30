@@ -1,6 +1,6 @@
 from typing import Union
 
-from pythonosc.udp_client import SimpleUDPClient
+from pythonosc.udp_client import SimpleUDPClient  # type: ignore[import]
 
 
 class MagicqController:
