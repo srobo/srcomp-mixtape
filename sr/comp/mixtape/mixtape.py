@@ -161,7 +161,7 @@ class Mixtape:
         name = f'MagicQ({magicq_playback}, {magicq_cue})'
 
         def action() -> None:
-            controller.jump_to_cue(magicq_playback, magicq_cue, 0)
+            controller.jump_to_cue(magicq_playback, magicq_cue)
 
         return action, name
 
