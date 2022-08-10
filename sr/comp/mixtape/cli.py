@@ -176,7 +176,7 @@ def test(args):
     magicq_controller = MagicqController(config['host'], config['port'])
 
     magicq_controller.jump_to_cue(4, 2)
-    time.sleep(1)
+    time.sleep(10)
     # magicq_controller.jump_to_cue(3, 2.5)
 
 
