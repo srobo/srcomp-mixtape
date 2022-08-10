@@ -95,6 +95,8 @@ def play(args):
     magicq_controller = None
     if 'magicq' in playlist:
         config = playlist['magicq']
+        if config['port'] == 6553:
+            print("WARNING: you are using the default magicq remote protocol port. Are you sure your OSC receive port is 6553")
         magicq_controller = MagicqController(config['host'], config['port'])
 
     obs_controller = None
