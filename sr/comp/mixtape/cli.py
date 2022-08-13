@@ -99,7 +99,7 @@ def play(args):
         if config['port'] == 6553:
             warnings.warn(
                 "You are using the default magicq remote protocol port. "
-                "Are you sure your OSC receive port is 6553?"
+                "Are you sure your OSC receive port is 6553?",
             )
         magicq_controller = MagicqController(config['host'], config['port'])
 
