@@ -19,6 +19,7 @@ setup(
         'obs-websocket-py >=0.5.3, <0.6',
         'python-dateutil >=2.4, <3',
         'typing-extensions >=3.7.4.3, <4',
+        'python-osc >=1.8.0, <2',
     ],
     python_requires='>=3.7',
     entry_points={

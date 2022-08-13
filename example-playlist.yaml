@@ -6,7 +6,7 @@ obs_studio:
   preroll_time: 5             # The number of seconds before an obs_video track that the video is loaded and transitioned to
 magicq:
   host: 127.0.0.1
-  port: 6553  # default Chamsys MagicQ port
+  port: 8000  # default Chamsys MagicQ OSC port
 all:
   # An example lighting cue action
   - start: -15              # Time, in seconds, relative to the match start time

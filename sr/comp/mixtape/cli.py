@@ -1,5 +1,6 @@
 import os.path
 import time
+import warnings
 from argparse import ArgumentParser
 from datetime import timedelta
 from typing import List, Set
@@ -95,7 +96,12 @@ def play(args):
     magicq_controller = None
     if 'magicq' in playlist:
         config = playlist['magicq']
-        magicq_controller = MagicqController((config['host'], config['port']))
+        if config['port'] == 6553:
+            warnings.warn(
+                "You are using the default magicq remote protocol port. "
+                "Are you sure your OSC receive port is 6553?",
+            )
+        magicq_controller = MagicqController(config['host'], config['port'])
 
     obs_controller = None
     if 'obs_studio' in playlist:
@@ -173,11 +179,11 @@ def test(args):
         playlist = yaml.safe_load(file)
 
     config = playlist['magicq']
-    magicq_controller = MagicqController((config['host'], config['port']))
+    magicq_controller = MagicqController(config['host'], config['port'])
 
-    magicq_controller.jump_to_cue(4, 2, 0)
-    time.sleep(1)
-    # magicq_controller.jump_to_cue(3, 2, 0)
+    magicq_controller.jump_to_cue(4, 2)
+    time.sleep(10)
+    # magicq_controller.jump_to_cue(3, 2.5)
 
 
 def main():
