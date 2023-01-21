@@ -27,7 +27,4 @@ setup(
             'srcomp-mixtape = sr.comp.mixtape.cli:main',
         ],
     },
-    setup_requires=[
-        'Sphinx >=1.3, <5',
-    ],
 )
