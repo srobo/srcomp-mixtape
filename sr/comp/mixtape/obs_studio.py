@@ -28,7 +28,7 @@ class Guarded(Generic[T]):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
-    ) -> Optional[bool]:
+    ) -> None:
         return self._lock.__exit__(exc_type, exc_val, exc_tb)
 
 
