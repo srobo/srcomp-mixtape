@@ -1,6 +1,6 @@
 import functools
-import os.path
 import logging
+import os.path
 import subprocess
 from typing import Any, Callable, Dict, Iterator, Optional, Tuple
 

@@ -1,6 +1,6 @@
+import logging
 import os.path
 import time
-import logging
 import warnings
 from argparse import ArgumentParser
 from datetime import timedelta
@@ -14,7 +14,11 @@ from .mixtape import Mixtape, populate_filename_placeholder
 from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%dT%H:%M:%S',
+)
 
 
 def get_parser():
@@ -103,6 +107,7 @@ def play(args):
             warnings.warn(
                 "You are using the default magicq remote protocol port. "
                 "Are you sure your OSC receive port is 6553?",
+                stacklevel=1,
             )
         magicq_controller = MagicqController(config['host'], config['port'])
 
