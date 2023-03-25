@@ -1,5 +1,6 @@
 import os.path
 import time
+import logging
 import warnings
 from argparse import ArgumentParser
 from datetime import timedelta
@@ -12,6 +13,8 @@ from .magicq import MagicqController
 from .mixtape import Mixtape, populate_filename_placeholder
 from .obs_studio import OBSStudioController
 from .scheduling import Scheduler
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
 
 
 def get_parser():
