@@ -201,5 +201,5 @@ class Mixtape:
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
-            logging.debug(F"Scheduling {name} for {track['start']}")
+            logging.debug(f"Scheduling {name} for {track['start']}")
             yield track['start'], 0, action
