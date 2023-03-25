@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import sched
 import threading
 import time
@@ -92,7 +93,7 @@ class Scheduler:
 
     def create_schedule_from(self, match: Match) -> sched.scheduler:
         num = match['num']
-        print("Entering period for match", num)
+        logging.info(f"Entering period for match {num}")
         game_start = dateutil.parser.parse(match['times']['game']['start']) - self.latency
 
         def current_offset() -> float:
@@ -134,7 +135,7 @@ class Scheduler:
                     match_schedule = self.get_match_schedule(now_utc())
                     match = match_schedule['matches'][0]
                 except (KeyError, IndexError):
-                    print('Waiting for a match.')
+                    logging.info('Waiting for a match.')
                     continue
 
             if prev_match is not None:

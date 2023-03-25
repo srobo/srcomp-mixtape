@@ -1,4 +1,5 @@
 import functools
+import logging
 import os.path
 import subprocess
 from typing import Any, Callable, Dict, Iterator, Optional, Tuple
@@ -46,7 +47,7 @@ class Mixtape:
         filename = populate_filename_placeholder(track['obs_video'], match_num)
         path = os.path.join(self.root, filename)
         if not os.path.exists(path):
-            print(f"File {path} could not be found, skipping")
+            logging.warning(f"File {path} could not be found, skipping")
             raise FileNotFoundError
         preload(path)
 
@@ -55,11 +56,12 @@ class Mixtape:
         controller = self.obs_studio_controller
 
         def action() -> None:
+            logging.info(f"Loading video {path}")
             controller.load_video(path)
 
-        print(
-            f"Scheduling load OBSStudio({path}) for",
-            track['start'] - controller.preroll_time,
+        logging.debug(
+            f"Scheduling load OBSStudio({path}) for "
+            f"{track['start'] - controller.preroll_time}",
         )
         return action, controller.preroll_time
 
@@ -79,6 +81,7 @@ class Mixtape:
         name = f'OBSStudio({path})'
 
         def action() -> None:
+            logging.info(f"Running {name}")
             controller.play_video()
 
         return action, name
@@ -97,6 +100,7 @@ class Mixtape:
         name = f'OBSStudio(scene={scene})'
 
         def action() -> None:
+            logging.info(f"Running {name}")
             controller.transition_scene(scene)
 
         return action, name
@@ -161,6 +165,7 @@ class Mixtape:
         name = f'MagicQ({magicq_playback}, {magicq_cue})'
 
         def action() -> None:
+            logging.info(f"Running {name}")
             controller.jump_to_cue(magicq_playback, magicq_cue)
 
         return action, name
@@ -196,5 +201,5 @@ class Mixtape:
             else:
                 raise ValueError(f"Unknown track type at index {idx} start:{track['start']}")
 
-            print('Scheduling', name, 'for', track['start'])
+            logging.debug(f"Scheduling {name} for {track['start']}")
             yield track['start'], 0, action
