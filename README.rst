@@ -53,7 +53,7 @@ time it takes to decode compressed audio, which can throw off timings.
     The source being controlled the option "Close file when inactive" needs to be set to allow the source to be changed when not active.
   - ``scene_name``: the name of the "Scene" within OBS Studio that contains the above Source.
     The scene being transitioned to needs "Transition Override > Fade" selected so there is a fade.
-  - ``preload_time``: the period, in seconds, before a video is played that it should be loaded and transitioned to.
+  - ``preload_time``: the duration, in seconds, before a video is played that it should be loaded and transitioned to.
 
 Track configuration
 -------------------
