@@ -93,7 +93,7 @@ class Scheduler:
 
     def create_schedule_from(self, match: Match) -> sched.scheduler:
         num = match['num']
-        logging.info(f"Entering period for match {num}")
+        logging.info(f"Entering slot for match {num}")
         game_start = dateutil.parser.parse(match['times']['game']['start']) - self.latency
 
         def current_offset() -> float:
