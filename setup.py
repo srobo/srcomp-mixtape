@@ -6,7 +6,7 @@ with open('README.rst') as f:
 setup(
     name='sr.comp.mixtape',
     version='1.0.0',
-    packages=find_packages(),
+    packages=find_packages(include=['sr.*']),
     namespace_packages=['sr', 'sr.comp'],
     description='A mixtape for the SR competition.',
     long_description=long_description,
