@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 with open('README.rst') as f:
     long_description = f.read()
@@ -6,7 +6,7 @@ with open('README.rst') as f:
 setup(
     name='sr.comp.mixtape',
     version='1.0.0',
-    packages=find_packages(include=['sr.*']),
+    packages=find_namespace_packages(include=['sr.*']),
     namespace_packages=['sr', 'sr.comp'],
     description='A mixtape for the SR competition.',
     long_description=long_description,
