@@ -80,7 +80,7 @@ def get_parser():
 
 def parse_ranges(ranges: str) -> Set[int]:
     """
-    Parse a comma seprated list of numbers which may include ranges
+    Parse a comma separated list of numbers which may include ranges
     specified as hyphen-separated numbers.
     From https://stackoverflow.com/questions/6405208
     """
