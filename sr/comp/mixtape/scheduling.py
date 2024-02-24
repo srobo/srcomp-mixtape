@@ -9,7 +9,7 @@ from typing_extensions import Protocol, TypedDict
 
 import dateutil.parser
 import requests
-import sseclient  # type: ignore[import]
+import sseclient  # type: ignore[import-untyped]
 from dateutil.tz import tzutc
 
 TLA = NewType('TLA', str)

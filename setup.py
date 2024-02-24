@@ -21,7 +21,7 @@ setup(
         'typing-extensions >=3.7.4.3, <5',
         'python-osc >=1.8.0, <2',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.9',
     entry_points={
         'console_scripts': [
             'srcomp-mixtape = sr.comp.mixtape.cli:main',

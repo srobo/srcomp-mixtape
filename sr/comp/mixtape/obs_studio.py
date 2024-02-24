@@ -2,7 +2,7 @@ import threading
 from types import TracebackType
 from typing import Generic, Optional, Type, TypeVar
 
-from obswebsocket import obsws, requests  # type: ignore[import]
+from obswebsocket import obsws, requests  # type: ignore[import-untyped]
 
 T = TypeVar('T')
 
