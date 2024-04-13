@@ -124,11 +124,11 @@ class Scheduler:
         prev_match: Optional[Match] = None
 
         for message in self.stream:
-            if message.event != 'match':
+            if message.event not in ('match', 'current-delay'):
                 continue
 
             matches = json.loads(message.data)
-            if matches:
+            if message.event == 'match' and matches:
                 match: Match = matches[0]
             else:
                 try:
