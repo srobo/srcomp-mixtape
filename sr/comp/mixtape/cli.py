@@ -203,8 +203,8 @@ def main():
         return
 
     if os.path.isfile(args.mixtape_directory):
-        print("You have entered a file for the playlist when you should have entered a directory!")
-        return 
+        print("File entered for the playlist when directory expected!")
+        return
 
     if args.command == 'play':
         play(args)
