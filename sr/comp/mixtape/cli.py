@@ -28,7 +28,7 @@ def get_parser():
 
     play = subparsers.add_parser('play', help='Play the mixtape.')
     play.add_argument(
-        'mixtape',
+        'mixtape-directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     play.add_argument('api', help='URL of the SRComp HTTP API')
@@ -52,7 +52,7 @@ def get_parser():
         help='Verify the audio files in the mixtape are found.',
     )
     verify.add_argument(
-        'mixtape',
+        'mixtape-directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     verify.add_argument(
@@ -70,7 +70,7 @@ def get_parser():
         ),
     )
     test.add_argument(
-        'mixtape',
+        'mixtape-directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     test.set_defaults(command='test')
