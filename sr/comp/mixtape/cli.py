@@ -203,7 +203,7 @@ def main():
         return
 
     if os.path.isfile(args.mixtape_directory):
-        exit("File entered for the playlist when directory expected!")
+        exit(f"{args.mixtape_directory!r} is a file. You must provide the directory containing the configuration and audio files.")
 
     if args.command == 'play':
         play(args)
