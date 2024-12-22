@@ -20,6 +20,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%dT%H:%M:%S',
 )
 
+class IncorrectDirectoryArgumentException(Exception):
+    pass
 
 def get_parser():
     parser = ArgumentParser(__name__)
@@ -203,8 +205,7 @@ def main():
         return
 
     if os.path.isfile(args.mixtape_directory):
-        print("File entered for the playlist when directory expected!")
-        return
+        raise IncorrectDirectoryArgumentException("File entered for the playlist when directory expected!")
 
     if args.command == 'play':
         play(args)

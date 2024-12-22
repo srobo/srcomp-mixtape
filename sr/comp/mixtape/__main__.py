@@ -1,3 +1,6 @@
 from . import cli
 
-cli.main()
+try:
+    cli.main()
+except cli.IncorrectDirectoryArgumentException:
+    print("File entered for the playlist when directory expected!")
