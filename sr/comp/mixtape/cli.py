@@ -28,7 +28,7 @@ def get_parser():
 
     play = subparsers.add_parser('play', help='Play the mixtape.')
     play.add_argument(
-        'mixtape',
+        'mixtape_directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     play.add_argument('api', help='URL of the SRComp HTTP API')
@@ -52,7 +52,7 @@ def get_parser():
         help='Verify the audio files in the mixtape are found.',
     )
     verify.add_argument(
-        'mixtape',
+        'mixtape_directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     verify.add_argument(
@@ -70,7 +70,7 @@ def get_parser():
         ),
     )
     test.add_argument(
-        'mixtape',
+        'mixtape_directory',
         help='The folder containing the playlist.yaml and audio files',
     )
     test.set_defaults(command='test')
@@ -97,7 +97,7 @@ def parse_ranges(ranges: str) -> Set[int]:
 
 
 def play(args):
-    with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
+    with open(os.path.join(args.mixtape_directory, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
 
     magicq_controller = None
@@ -125,7 +125,7 @@ def play(args):
     audio_controller = AudioController(args.audio_backend)
 
     mixtape = Mixtape(
-        args.mixtape,
+        args.mixtape_directory,
         playlist,
         audio_controller,
         magicq_controller,
@@ -173,17 +173,17 @@ def verify_tracks(mixtape_dir, tracks, matches):
 
 
 def verify(args):
-    with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
+    with open(os.path.join(args.mixtape_directory, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
 
     for tracks in playlist['tracks'].values():
-        verify_tracks(args.mixtape, tracks, args.matches)
+        verify_tracks(args.mixtape_directory, tracks, args.matches)
 
-    verify_tracks(args.mixtape, playlist.get('all', []), args.matches)
+    verify_tracks(args.mixtape_directory, playlist.get('all', []), args.matches)
 
 
 def test(args):
-    with open(os.path.join(args.mixtape, 'playlist.yaml')) as file:
+    with open(os.path.join(args.mixtape_directory, 'playlist.yaml')) as file:
         playlist = yaml.safe_load(file)
 
     config = playlist['magicq']
@@ -201,6 +201,12 @@ def main():
     if 'command' not in args:
         parser.print_help()
         return
+
+    if os.path.isfile(args.mixtape_directory):
+        exit(
+            f"{args.mixtape_directory!r} is a file. You must provide the directory "
+            "containing the configuration and audio files.",
+        )
 
     if args.command == 'play':
         play(args)
