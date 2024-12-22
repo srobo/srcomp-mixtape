@@ -205,7 +205,7 @@ def main():
         return
 
     if os.path.isfile(args.mixtape_directory):
-        raise IncorrectDirectoryArgumentException("File entered for the playlist when directory expected!")
+        exit("File entered for the playlist when directory expected!")
 
     if args.command == 'play':
         play(args)
