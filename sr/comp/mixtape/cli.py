@@ -20,6 +20,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%dT%H:%M:%S',
 )
 
+
 def get_parser():
     parser = ArgumentParser(__name__)
 
