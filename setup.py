@@ -19,7 +19,12 @@ setup(
         'obs-websocket-py >=0.5.3, <0.6',
         'python-dateutil >=2.4, <3',
         'typing-extensions >=3.7.4.3, <5',
-        'python-osc >=1.8.0, <2',
+        # v1.9 drops type annotations, which we're relying on, and also support
+        # for Python 3.9 -- meaning that we get different versions of the
+        # library on different Python versions in CI. Pinning to a thinner range
+        # avoids needing different typing setups for different Python versions.
+        # See https://github.com/attwad/python-osc/issues/182.
+        'python-osc >=1.8.0, <1.9, <2',
     ],
     python_requires='>=3.9',
     entry_points={
