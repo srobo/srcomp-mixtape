@@ -203,7 +203,8 @@ def main():
         return
 
     if os.path.isfile(args.mixtape_directory):
-        exit(f"{args.mixtape_directory!r} is a file. You must provide the directory containing the configuration and audio files.")
+        exit(f"{args.mixtape_directory!r} is a file. You must provide the directory "
+             "containing the configuration and audio files.")
 
     if args.command == 'play':
         play(args)
