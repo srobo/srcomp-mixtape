@@ -50,6 +50,8 @@ class OBSStudioController:
         websocket = obsws('localhost', port, password)
         websocket.connect()
 
+        websocket.call(requests.StartReplayBuffer())
+
         self.source_name = source
         self.scene_name = scene
         self.preroll_time = preroll_time
