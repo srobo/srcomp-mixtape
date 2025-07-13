@@ -85,6 +85,24 @@ class Mixtape:
             controller.play_video()
 
         return action, name
+    
+    def get_save_video_action(
+        self,
+        track: Any,
+        current_offset: Callable[[], float],
+        match_num: int,
+    ) -> Tuple[Action, str]:
+
+        if self.obs_studio_controller is None:
+            raise ValueError(f"Need a obs_studio_controller to use the replay buffer")
+        controller = self.obs_studio_controller
+
+        def action() -> None:
+            logging.info(f"Saving replay for previous match")
+            controller.save_match()
+
+        # TODO: Figure out what to put here...
+        return action, "save"
 
     def get_transition_scene_action(
         self,
