@@ -50,6 +50,7 @@ class OBSStudioController:
         websocket = obsws('localhost', port, password)
         websocket.connect()
 
+        # Start the replay buffer when we initially connect (so we can save a match when it finishes).
         websocket.call(requests.StartReplayBuffer())
 
         self.source_name = source
@@ -97,3 +98,7 @@ class OBSStudioController:
     def transition_scene(self, scene_name: str) -> None:
         with self.websocket as websocket:
             websocket.call(requests.SetCurrentScene(scene_name))
+
+    def save_match(self) -> None:
+        with self.websocket as websocket:
+            websocket.call(requests.SaveReplayBuffer())
